@@ -13,10 +13,14 @@ import { VotingAbi } from "../common/abis/votingAbi";
 import Loading from "./internal/util/Loading";
 import { felt252ToString } from "./internal/helpers";
 import TableRow from "./TableRow";
+import { useMemo, useState } from "react";
+import BatchNominee from "./BatchNominee";
 
 export default function Table(){
 
-    const searchParams = useSearchParams()
+    const searchParams = useSearchParams();
+    const [searchTerm, setSearchTerm] = useState("");
+
 
     // TODO - Implement Search Functionality
     const page = searchParams.get("page") || 1;
@@ -50,14 +54,22 @@ export default function Table(){
         args: []
     })
 
-    const allCandidates = data as Array<any>;
+    const allCandidates = (data as Array<any>) || [];
+     
+    const filteredCandidates = useMemo(() => {
+        const search = searchTerm.trim().toLowerCase();
 
-    console.log(allCandidates)
+        return allCandidates.filter((candidate) => {
+            const surname = felt252ToString(candidate.lname || "").toLowerCase();
+            const firstname = felt252ToString(candidate.fname || "").toLowerCase();
+            return surname.includes(search) || firstname.includes(search);
+        });
+    }, [allCandidates, searchTerm]);
 
     return (
         <div className="w-full mx-auto px-12 py-12">
             
-            <TableHeader candidates={allCandidates} />
+            <TableHeader totalCount={allCandidates.length} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
             <div className="overflow-x-auto mt-10 rounded-lg">
                 <table className="min-w-full table-auto rounded-lg">
@@ -69,12 +81,12 @@ export default function Table(){
                             <td className="py-4 px-4 tracking-wider whitespace-nowrap capitalize">Number of Votes</td>
                             <td className="py-4 px-4 tracking-wider whitespace-nowrap capitalize">Qualification Status</td>
                             <td className="py-4 px-4 tracking-wider whitespace-nowrap capitalize">Vote</td>
-                            {/* <th className="py-4 px-4 tracking-wider whitespace-nowrap capitalize">Disqualify</th> */}
+                            <th className="py-4 px-4 tracking-wider whitespace-nowrap capitalize">Disqualify</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white">
                         {
-                            allCandidates?.slice(from, to).map((candidate, index) => {
+                            filteredCandidates?.slice(from, to).map((candidate, index) => {
                                 return <TableRow candidate={candidate} index={index} key={index} />
                             })
                         }
@@ -83,13 +95,16 @@ export default function Table(){
             </div>
 
             {/* TABLE CONTROLS */}
-            <TableControls togglePopover={togglePopover} candidates={allCandidates} />
+            <TableControls togglePopover={togglePopover} candidates={filteredCandidates} />
             <GenericModal
                 popoverId="transaction-modal"
                 style=""
             >
                 <AddNominee />
             </GenericModal>
+            <GenericModal popoverId="batch-nominee-modal" style="">
+  <BatchNominee />
+</GenericModal>
 
         </div>
     )

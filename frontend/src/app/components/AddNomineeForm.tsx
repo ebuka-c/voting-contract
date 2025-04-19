@@ -1,3 +1,6 @@
+
+
+"use client"
 import { FormEvent, FormEventHandler, useMemo, useState } from "react";
 import GenericModal from "./internal/util/GenericModal";
 import { useAccount, useContract, useContractWrite, useWaitForTransaction } from "@starknet-react/core";
@@ -5,7 +8,7 @@ import { VotingAbi } from "../common/abis/votingAbi";
 import { ContractAddress } from "../common/data";
 import { CallData } from "starknet";
 import Loading from "./internal/util/Loading";
-import { useForm } from 'react-hook-form'
+// import { useForm } from 'react-hook-form'
 
 export default function AddNominee() {
 

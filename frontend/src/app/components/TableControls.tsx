@@ -18,6 +18,12 @@ export default function TableControls({togglePopover, candidates}: {
                     }}>
                         Nominate a Candidate
                     </button>
+                    <button className="text-black bg-pink-600 px-6 py-3 rounded-md flex items-center  gap-2" onClick={() => {
+                        console.log("clicked")
+                        togglePopover({ targetId: "batch-nominee-modal" })
+                    }}>
+                        Batch Nominate 
+                    </button>
                 </div>
 
                 <div className="">
